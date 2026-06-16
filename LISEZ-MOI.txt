@@ -1,0 +1,55 @@
+PORTFOLIO BUT R&T
+=================
+
+Site web personnel (multi-pages) pour présenter ton parcours, tes 3 compétences
+et tes projets, dans le cadre du BUT Réseaux & Télécommunications.
+
+
+COMMENT L'OUVRIR
+----------------
+Garde TOUS les fichiers ensemble dans le même dossier, puis ouvre "index.html"
+dans ton navigateur (double-clic).
+
+
+LES FICHIERS
+------------
+  index.html         Page d'accueil
+  a-propos.html      Présentation, parcours
+  competences.html   Les 3 compétences + apprentissages critiques (clic = détail)
+  projets.html       Galerie de projets filtrable + preuves photos
+  contact.html       Coordonnées + formulaire de contact
+
+  style.css          Le design (à ne pas modifier sauf si tu sais ce que tu fais)
+  main.js            La navigation et les animations
+  data.js   ←★       TOUT TON CONTENU MODIFIABLE EST ICI
+  images/            Dépose tes photos de preuves ici
+
+
+PERSONNALISER LE CONTENU  (fichier data.js)
+-------------------------------------------
+1. PROFIL       : ton nom, email, LinkedIn, GitHub, ville.
+2. COMPETENCES  : la description (desc) de chaque apprentissage critique.
+3. PROJETS      : tes projets. Pour chacun :
+                  - comp    "a" Administrer / "b" Connecter / "c" Programmer
+                  - ce      les apprentissages validés, ex ["CE1.01","CE1.04"]
+                  - lien    URL du dépôt/projet ("" si aucun)
+                  - resume / desc  les textes
+                  - tags    technologies
+                  - preuves photos justificatives :
+                      preuves:[
+                        { img:"images/ma-photo.jpg", legende:"Description" }
+                      ]
+4. PARCOURS     : ta frise chronologique (page À propos).
+
+Un projet ajouté apparaît automatiquement dans la galerie ET dans le détail
+des bons apprentissages critiques (page Compétences).
+
+
+AJOUTER DES PHOTOS DE PREUVES
+-----------------------------
+1. Mets l'image dans le dossier "images/".
+2. Référence-la dans data.js (champ "preuves" du projet).
+3. Dans le site, un clic sur la photo l'ouvre en grand.
+
+
+Bon courage pour ton portfolio !

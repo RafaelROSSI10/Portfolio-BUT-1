@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compétences — Portfolio BUT R&T</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="index.html"><span data-profil-nom>ROSSI Rafael</span><span class="brand-dot"></span></a>
+  <button class="nav-toggle">Menu</button>
+  <div class="nav-links">
+    <a href="index.html">Accueil</a>
+    <a href="a-propos.html">À propos</a>
+    <a href="competences.html">Compétences</a>
+    <a href="projets.html">Projets</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<div class="page-head">
+  <div class="heat-glow"></div>
+  <div class="wrap">
+    <p class="eyebrow stagger d1">Référentiel de formation</p>
+    <h1 class="page-title stagger d2"><span class="grad-rouge">Comp</span><span class="grad-orange">é</span><span class="grad-jaune">tences</span></h1>
+    <p class="page-intro stagger d3">Les trois compétences fondamentales du parcours, déclinées en apprentissages critiques. Cliquez sur un apprentissage pour découvrir le détail et les projets associés.</p>
+  </div>
+</div>
+
+<main id="comp-sections"></main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div>
+      <div class="heat-bar"></div>
+      <p class="f-name" data-profil-nom>ROSSI Rafael</p>
+      <p class="f-sub" data-profil-formation>BUT Réseaux & Télécommunications</p>
+    </div>
+    <div class="f-links">
+      <a href="index.html">Accueil</a><a href="a-propos.html">À propos</a>
+      <a href="competences.html">Compétences</a><a href="projets.html">Projets</a><a href="contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel" role="dialog" aria-modal="true">
+    <div class="modal-glow"></div>
+    <button class="m-close" data-close aria-label="Fermer">&times;</button>
+    <p class="m-comp" id="m-comp"></p>
+    <p class="m-code" id="m-code"></p>
+    <h2 class="m-statement" id="m-statement"></h2>
+    <p class="m-section-label">La compétence</p>
+    <div class="m-desc" id="m-desc"></div>
+    <p class="m-section-label" id="m-proj-label">Projets associés</p>
+    <div id="m-projects"></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="main.js"></script>
+<script>
+  /* Construit les 3 sections + listes de CE */
+  const root = document.getElementById('comp-sections');
+  Object.values(COMPETENCES).forEach(c=>{
+    const sec = document.createElement('section');
+    sec.className='comp'; sec.id=c.cle; sec.dataset.c=c.cle;
+    sec.innerHTML = `
+      <div class="sec-glow"></div>
+      <div class="wrap">
+        <div class="comp-head reveal"><span class="comp-num">${c.lettre} / Compétence</span><h2 class="comp-title">${c.nom}</h2></div>
+        <p class="comp-sub reveal">${c.sousTitre}</p>
+        <div class="comp-rule reveal"></div>
+        <div class="ce-list"></div>
+      </div>`;
+    const list = sec.querySelector('.ce-list');
+    c.items.forEach((it,idx)=>{
+      const projs = PROJETS.filter(p=>p.ce.includes(it.code));
+      const art = document.createElement('article');
+      art.className='ce reveal';
+      art.innerHTML = `
+        <div class="ce-code">${it.code}</div>
+        <div class="ce-body"><p class="ce-statement">${it.statement}</p><p class="ce-preview">${it.preview}</p></div>
+        <span class="ce-cta">Détail <span class="ce-count">${projs.length} projet${projs.length>1?'s':''}</span><span class="arrow">↗</span></span>`;
+      art.addEventListener('click', ()=>openCE(c.cle, idx));
+      list.appendChild(art);
+    });
+    root.appendChild(sec);
+  });
+
+  /* Modal */
+  const M = setupModal();
+  function openCE(key, idx){
+    const c = COMPETENCES[key];
+    const it = c.items[idx];
+    const projs = PROJETS.filter(p=>p.ce.includes(it.code));
+    M.modal.querySelector('.modal-panel').style.setProperty('--ac', accentVar[key]);
+    document.getElementById('m-comp').textContent = compNomComplet[key];
+    document.getElementById('m-code').textContent = it.code;
+    document.getElementById('m-statement').textContent = it.statement;
+    document.getElementById('m-desc').innerHTML = it.desc.map(p=>`<p>${p}</p>`).join('');
+    const wrap = document.getElementById('m-projects');
+    if(projs.length){
+      wrap.innerHTML = projs.map(p=>`
+        <div class="proj">
+          <div class="proj-title">${p.titre}${p.lien?` <a href="${p.lien}" target="_blank" rel="noopener">Voir ↗</a>`:''}</div>
+          <p class="proj-desc">${p.resume}</p>
+          <div class="proj-tags">${p.tags.map(t=>`<span class="proj-tag">${t}</span>`).join('')}</div>
+        </div>`).join('');
+    } else {
+      wrap.innerHTML = `<p class="proj-desc" style="opacity:.6">Aucun projet associé pour le moment.</p>`;
+    }
+    document.getElementById('m-proj-label').textContent = `Projets associés (${projs.length})`;
+    M.modal.classList.add('open'); M.modal.setAttribute('aria-hidden','false');
+    document.body.classList.add('locked'); M.modal.querySelector('.modal-panel').scrollTop=0;
+  }
+
+  /* Re-observe les éléments générés dynamiquement */
+  const io2 = new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io2.unobserve(e.target);}})},{threshold:.1,rootMargin:'0px 0px -6% 0px'});
+  document.querySelectorAll('.reveal:not(.in)').forEach((el,i)=>{el.style.transitionDelay=(i%5*55)+'ms';io2.observe(el);});
+
+  /* Si on arrive via #a/#b/#c, scroll vers la section */
+  if(location.hash){ const t=document.querySelector(location.hash); if(t) setTimeout(()=>t.scrollIntoView({behavior:'smooth'}),300); }
+</script>
+</body>
+</html>
