@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projets — Portfolio BUT R&T</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="index.html"><span data-profil-nom>ROSSI Rafael</span><span class="brand-dot"></span></a>
+  <button class="nav-toggle">Menu</button>
+  <div class="nav-links">
+    <a href="index.html">Accueil</a>
+    <a href="a-propos.html">À propos</a>
+    <a href="competences.html">Compétences</a>
+    <a href="projets.html">Projets</a>
+    <a href="contact.html">Contact</a>
+  </div>
+</nav>
+
+<div class="page-head">
+  <div class="heat-glow"></div>
+  <div class="wrap">
+    <p class="eyebrow stagger d1">Mes réalisations</p>
+    <h1 class="page-title stagger d2"><span class="grad-jaune">Pro</span><span class="grad-orange">jets</span></h1>
+    <p class="page-intro stagger d3">Une sélection de projets réalisés durant ma formation, classés par compétence. Cliquez sur un projet pour en savoir plus.</p>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <div class="filters reveal">
+      <button class="filter-btn active" data-filter="all">Tous</button>
+      <button class="filter-btn" data-filter="a">Administrer</button>
+      <button class="filter-btn" data-filter="b">Connecter</button>
+      <button class="filter-btn" data-filter="c">Programmer</button>
+    </div>
+    <div class="proj-grid" id="proj-grid"></div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap footer-inner">
+    <div>
+      <div class="heat-bar"></div>
+      <p class="f-name" data-profil-nom>ROSSI Rafael</p>
+      <p class="f-sub" data-profil-formation>BUT Réseaux & Télécommunications</p>
+    </div>
+    <div class="f-links">
+      <a href="index.html">Accueil</a><a href="a-propos.html">À propos</a>
+      <a href="competences.html">Compétences</a><a href="projets.html">Projets</a><a href="contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel" role="dialog" aria-modal="true">
+    <div class="modal-glow"></div>
+    <button class="m-close" data-close aria-label="Fermer">&times;</button>
+    <p class="m-comp" id="m-comp"></p>
+    <h2 class="m-statement" id="m-statement"></h2>
+    <p class="m-section-label">Le projet</p>
+    <div class="m-desc" id="m-desc"></div>
+    <p class="m-section-label">Preuves</p>
+    <div class="proof-grid" id="m-proofs"></div>
+    <p class="m-section-label">Apprentissages validés</p>
+    <div class="proj-tags" id="m-ce" style="margin-bottom:6px"></div>
+    <p class="m-section-label">Technologies</p>
+    <div class="proj-tags" id="m-tags"></div>
+    <div id="m-link" style="margin-top:28px"></div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" aria-label="Fermer">&times;</button>
+  <img id="lb-img" src="" alt="">
+  <p class="lb-cap" id="lb-cap"></p>
+</div>
+
+<script src="data.js"></script>
+<script src="main.js"></script>
+<script>
+  const grid = document.getElementById('proj-grid');
+  const compNom = { a:"Administrer", b:"Connecter", c:"Programmer" };
+
+  function render(filter){
+    grid.innerHTML='';
+    const list = PROJETS.filter(p=> filter==='all' || p.comp===filter);
+    if(!list.length){ grid.innerHTML='<p class="empty-msg">Aucun projet dans cette catégorie pour le moment.</p>'; return; }
+    list.forEach((p,i)=>{
+      const card = document.createElement('div');
+      card.className='pcard reveal in'; card.dataset.c=p.comp;
+      card.style.transitionDelay=(i%6*45)+'ms';
+      card.innerHTML = `
+        <div class="pcard-cover"><div class="cv-glow"></div><div class="cv-mark">${p.titre.charAt(0)}</div></div>
+        <div class="pcard-body">
+          <div class="pcard-comp">${compNom[p.comp]} · ${p.ce.join(', ')}</div>
+          <div class="pcard-title">${p.titre}</div>
+          <p class="pcard-desc">${p.resume}</p>
+          <div class="pcard-tags">${p.tags.map(t=>`<span class="proj-tag">${t}</span>`).join('')}</div>
+        </div>`;
+      card.addEventListener('click', ()=>openProj(p));
+      grid.appendChild(card);
+    });
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); render(b.dataset.filter);
+    });
+  });
+
+  const M = setupModal();
+  function openProj(p){
+    M.modal.querySelector('.modal-panel').style.setProperty('--ac', accentVar[p.comp]);
+    document.getElementById('m-comp').textContent = compNom[p.comp];
+    document.getElementById('m-statement').textContent = p.titre;
+    document.getElementById('m-desc').innerHTML = p.desc.map(t=>`<p>${t}</p>`).join('');
+    document.getElementById('m-ce').innerHTML = p.ce.map(c=>`<span class="proj-tag">${c}</span>`).join('');
+    document.getElementById('m-tags').innerHTML = p.tags.map(t=>`<span class="proj-tag">${t}</span>`).join('');
+
+    // --- Preuves ---
+    const proofs = p.preuves || [];
+    const pwrap = document.getElementById('m-proofs');
+    if(!proofs.length){
+      pwrap.className=''; pwrap.innerHTML = `<p class="proof-empty-msg">Aucune preuve ajoutée pour le moment.</p>`;
+    } else {
+      pwrap.className='proof-grid';
+      pwrap.innerHTML = proofs.map((pr,i)=>{
+        if(!pr.img){
+          return `<div class="proof empty"><div><div class="ph-ic">+</div><div class="ph-txt">${pr.legende||'Photo à ajouter'}</div></div></div>`;
+        }
+        return `<div class="proof" data-idx="${i}">
+            <img src="${pr.img}" alt="${pr.legende||''}" onerror="this.parentElement.classList.add('empty');this.parentElement.innerHTML='<div><div class=\\'ph-ic\\'>!</div><div class=\\'ph-txt\\'>Image introuvable<br>${(pr.img||'').replace(/'/g,'')}</div></div>'">
+            <span class="zoom-hint">⤢</span>
+            ${pr.legende?`<span class="proof-cap">${pr.legende}</span>`:''}
+          </div>`;
+      }).join('');
+      // clic = ouvrir la visionneuse
+      pwrap.querySelectorAll('.proof[data-idx]').forEach(el=>{
+        el.addEventListener('click', ()=>{
+          const pr = proofs[+el.dataset.idx];
+          if(pr.img) openLightbox(pr.img, pr.legende||'');
+        });
+      });
+    }
+
+    document.getElementById('m-link').innerHTML = p.lien
+      ? `<a href="${p.lien}" target="_blank" rel="noopener" class="btn primary" style="--ac:${accentVar[p.comp]}">Voir le projet ↗</a>` : '';
+    M.modal.classList.add('open'); M.modal.setAttribute('aria-hidden','false');
+    document.body.classList.add('locked'); M.modal.querySelector('.modal-panel').scrollTop=0;
+  }
+
+  /* Visionneuse plein écran */
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img');
+  const lbCap = document.getElementById('lb-cap');
+  function openLightbox(src, cap){
+    lbImg.src = src; lbImg.alt = cap; lbCap.textContent = cap;
+    lb.classList.add('open');
+  }
+  function closeLightbox(){ lb.classList.remove('open'); }
+  lb.querySelector('.lb-close').addEventListener('click', closeLightbox);
+  lb.addEventListener('click', e=>{ if(e.target===lb) closeLightbox(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeLightbox(); });
+
+  render('all');
+</script>
+</body>
+</html>
