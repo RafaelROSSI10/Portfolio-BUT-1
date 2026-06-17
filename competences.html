@@ -74,6 +74,7 @@
       <div class="wrap">
         <div class="comp-head reveal"><span class="comp-num">${c.lettre} / Compétence</span><h2 class="comp-title">${c.nom}</h2></div>
         <p class="comp-sub reveal">${c.sousTitre}</p>
+        ${c.intro?`<p class="comp-intro reveal">${c.intro}</p>`:''}
         <div class="comp-rule reveal"></div>
         <div class="ce-list"></div>
       </div>`;
@@ -107,7 +108,7 @@
     if(projs.length){
       wrap.innerHTML = projs.map(p=>`
         <div class="proj">
-          <div class="proj-title">${p.titre}${p.lien?` <a href="${p.lien}" target="_blank" rel="noopener">Voir ↗</a>`:''}</div>
+          <div class="proj-title">${p.sae} — ${p.titre}${p.lien?` <a href="${p.lien}" target="_blank" rel="noopener">Voir ↗</a>`:''}</div>
           <p class="proj-desc">${p.resume}</p>
           <div class="proj-tags">${p.tags.map(t=>`<span class="proj-tag">${t}</span>`).join('')}</div>
         </div>`).join('');
